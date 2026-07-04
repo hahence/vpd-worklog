@@ -12,19 +12,24 @@ export type AbsenceType =
 
 export interface User {
   id: string
+  /** 사번 5~6자리 (로그인 ID) */
+  empId: string
   name: string
   teamId: string
   role: Role
   color: string
-  /** 개인 평소 출근시각 HH:mm */
+  /** 근무 지역 (기본 출퇴근시각을 결정) */
+  region: string
+  /** 개인 평소 출근시각 HH:mm (지역 기본값 기반) */
   defaultCheckIn: string
-  /** 개인 평소 퇴근시각 HH:mm */
+  /** 개인 평소 퇴근시각 HH:mm (지역 기본값 기반) */
   defaultCheckOut: string
 }
 
 export interface Team {
   id: string
   name: string
+  region: string
 }
 
 export interface Attendance {

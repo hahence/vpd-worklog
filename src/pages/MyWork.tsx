@@ -10,9 +10,9 @@ import {
 } from '../domain/calc'
 import { fmtDateKr, fmtHours, isWeekend, parseDate, todayStr } from '../domain/time'
 
-export function MyWork() {
+export function MyWork({ embed = false }: { embed?: boolean }) {
   const app = useApp()
-  const { currentUser } = app
+  const currentUser = app.currentUser!
   const today = todayStr()
   const [period, setPeriod] = useState(getPeriod(new Date()))
 
@@ -45,8 +45,10 @@ export function MyWork() {
     <>
       <div className="page-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 10 }}>
         <div>
-          <h1 className="page-title">내 근무</h1>
-          <p className="page-sub">{currentUser.name} · 기준월 {period.label}</p>
+          {!embed && <h1 className="page-title">내 근무</h1>}
+          <p className="page-sub" style={embed ? { marginTop: 0 } : undefined}>
+            {currentUser.name} · 기준월 {period.label}
+          </p>
         </div>
         <div className="btn-row">
           <button className="btn btn-sm" onClick={() => setPeriod(shiftPeriod(period, -1))}>← 이전</button>

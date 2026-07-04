@@ -4,11 +4,12 @@ import { Avatar, Progress } from '../components/ui'
 import { getPeriod, monthSummary, shiftPeriod } from '../domain/calc'
 import { fmtHours, todayStr } from '../domain/time'
 
-export function MonthlyBoard() {
+export function MonthlyBoard({ embed = false }: { embed?: boolean }) {
   const app = useApp()
+  const me = app.currentUser!
   const today = todayStr()
   const [period, setPeriod] = useState(getPeriod(new Date()))
-  const members = app.users.filter((u) => u.role === 'member')
+  const members = app.teamMembers(me.teamId)
 
   const rows = members
     .map((m) => ({
@@ -24,8 +25,8 @@ export function MonthlyBoard() {
     <>
       <div className="page-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 10 }}>
         <div>
-          <h1 className="page-title">월 누적 현황</h1>
-          <p className="page-sub">
+          {!embed && <h1 className="page-title">월 누적 현황</h1>}
+          <p className="page-sub" style={embed ? { marginTop: 0 } : undefined}>
             각자 목표시간이 다르므로 <b>진척률(%)</b> 기준 비교 · {period.label}
           </p>
         </div>

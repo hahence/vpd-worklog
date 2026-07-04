@@ -12,6 +12,16 @@ export const POLICY = {
   periodEndDay: 19,
 } as const
 
+/** 지역별 기본 출퇴근시각 (지역마다 조금씩 다름) */
+export const REGION_DEFAULT: Record<string, { checkIn: string; checkOut: string }> = {
+  판교: { checkIn: '08:30', checkOut: '17:30' },
+  대전: { checkIn: '08:00', checkOut: '17:00' },
+}
+
+export function regionDefault(region: string) {
+  return REGION_DEFAULT[region] ?? { checkIn: '09:00', checkOut: '18:00' }
+}
+
 export const WORK_TYPE_LABEL: Record<WorkType, string> = {
   office: '사무실',
   remote: '재택',

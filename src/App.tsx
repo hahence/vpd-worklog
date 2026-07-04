@@ -1,34 +1,48 @@
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useApp } from './store/AppStore'
 import { Avatar } from './components/ui'
-import { MemberHome } from './pages/MemberHome'
-import { MyWork } from './pages/MyWork'
+import { LoginPage } from './pages/LoginPage'
+import { TodayPage } from './pages/TodayPage'
+import { MonthlyPage } from './pages/MonthlyPage'
 import { AbsencePage } from './pages/AbsencePage'
-import { Dashboard } from './pages/Dashboard'
-import { MonthlyBoard } from './pages/MonthlyBoard'
-import { TeamAbsence } from './pages/TeamAbsence'
 
-type Role = 'member' | 'manager'
+interface Tab {
+  key: string
+  label: string
+  icon: string
+  webOnly?: boolean
+}
 
-const MEMBER_TABS = [
-  { key: 'home', label: '홈', icon: '🏠' },
+const TABS: Tab[] = [
+  { key: 'today', label: '오늘 근태', icon: '🕘' },
+  { key: 'monthly', label: '월간 현황', icon: '📈', webOnly: true },
   { key: 'absence', label: '부재·연차', icon: '🗓️' },
-  { key: 'mywork', label: '내 근무', icon: '📊' },
 ]
-const MANAGER_TABS = [
-  { key: 'dashboard', label: '오늘 현황', icon: '📋' },
-  { key: 'monthly', label: '월 누적', icon: '📈' },
-  { key: 'teamabs', label: '팀 부재', icon: '🗓️' },
-]
+
+/* ---- responsive hook ---- */
+function useIsMobile(): boolean {
+  const [m, setM] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(max-width: 860px)').matches
+      : false,
+  )
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 860px)')
+    const h = () => setM(mq.matches)
+    mq.addEventListener('change', h)
+    return () => mq.removeEventListener('change', h)
+  }, [])
+  return m
+}
 
 /* ---- Toast ---- */
 const ToastCtx = createContext<(msg: string) => void>(() => {})
 export const useToast = () => useContext(ToastCtx)
 
 export function App() {
-  const { currentUser, users, currentUserId, setCurrentUserId, resetDemo } = useApp()
-  const [role, setRole] = useState<Role>('member')
-  const [tab, setTab] = useState('home')
+  const { currentUser, teams, logout, resetDemo } = useApp()
+  const isMobile = useIsMobile()
+  const [tab, setTab] = useState('today')
   const [toast, setToast] = useState<string | null>(null)
 
   const showToast = useCallback((msg: string) => {
@@ -37,28 +51,40 @@ export function App() {
     ;(showToast as any)._t = window.setTimeout(() => setToast(null), 1900)
   }, [])
 
-  const tabs = role === 'member' ? MEMBER_TABS : MANAGER_TABS
-  const activeTab = tabs.find((t) => t.key === tab) ? tab : tabs[0].key
-
-  const switchRole = (r: Role) => {
-    setRole(r)
-    setTab(r === 'member' ? 'home' : 'dashboard')
+  if (!currentUser) {
+    return (
+      <ToastCtx.Provider value={showToast}>
+        <LoginPage />
+      </ToastCtx.Provider>
+    )
   }
 
-  const members = users.filter((u) => u.role === 'member')
+  const tabs = TABS.filter((t) => !(isMobile && t.webOnly))
+  const activeTab = tabs.find((t) => t.key === tab) ? tab : tabs[0].key
+  const team = teams.find((t) => t.id === currentUser.teamId)
 
   const renderPage = () => {
-    if (role === 'member') {
-      if (activeTab === 'home') return <MemberHome />
-      if (activeTab === 'absence') return <AbsencePage />
-      if (activeTab === 'mywork') return <MyWork />
-    } else {
-      if (activeTab === 'dashboard') return <Dashboard />
-      if (activeTab === 'monthly') return <MonthlyBoard />
-      if (activeTab === 'teamabs') return <TeamAbsence />
-    }
+    if (activeTab === 'today') return <TodayPage />
+    if (activeTab === 'monthly') return <MonthlyPage />
+    if (activeTab === 'absence') return <AbsencePage />
     return null
   }
+
+  const UserBox = () => (
+    <div className="userpick" style={{ marginTop: 0 }}>
+      <Avatar user={currentUser} size={32} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontWeight: 700, fontSize: 13.5 }}>
+          {currentUser.name}
+          {currentUser.role === 'manager' && <span className="tag-lead">팀장</span>}
+        </div>
+        <div className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {team?.name} · 사번 {currentUser.empId}
+        </div>
+      </div>
+      <button className="btn btn-sm" onClick={logout}>로그아웃</button>
+    </div>
+  )
 
   return (
     <ToastCtx.Provider value={showToast}>
@@ -73,16 +99,7 @@ export function App() {
             </div>
           </div>
 
-          <div className="role-switch">
-            <button className={role === 'member' ? 'on' : ''} onClick={() => switchRole('member')}>
-              구성원
-            </button>
-            <button className={role === 'manager' ? 'on' : ''} onClick={() => switchRole('manager')}>
-              팀장
-            </button>
-          </div>
-
-          <nav className="nav" style={{ marginTop: 16 }}>
+          <nav className="nav" style={{ marginTop: 10 }}>
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -96,26 +113,7 @@ export function App() {
           </nav>
 
           <div className="sidebar-foot">
-            {role === 'member' ? (
-              <div className="userpick">
-                <Avatar user={currentUser} size={30} />
-                <select
-                  value={currentUserId}
-                  onChange={(e) => setCurrentUserId(e.target.value)}
-                >
-                  {members.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : (
-              <div className="userpick">
-                <Avatar user={users[0]} size={30} />
-                <div style={{ flex: 1, fontWeight: 600 }}>{users[0].name} 팀장</div>
-              </div>
-            )}
+            <UserBox />
             <button className="btn btn-sm" style={{ width: '100%', marginTop: 8 }} onClick={resetDemo}>
               데모 데이터 초기화
             </button>
@@ -128,36 +126,18 @@ export function App() {
           <header className="topbar">
             <div className="brand" style={{ padding: 0 }}>
               <div className="brand-logo" style={{ width: 30, height: 30, fontSize: 16 }}>⏱</div>
-              <div className="brand-name" style={{ fontSize: 15 }}>WorkLog</div>
+              <div>
+                <div className="brand-name" style={{ fontSize: 15 }}>WorkLog</div>
+              </div>
             </div>
-            <div className="role-switch" style={{ width: 160 }}>
-              <button className={role === 'member' ? 'on' : ''} onClick={() => switchRole('member')}>
-                구성원
-              </button>
-              <button className={role === 'manager' ? 'on' : ''} onClick={() => switchRole('manager')}>
-                팀장
-              </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Avatar user={currentUser} size={30} />
+              <button className="btn btn-sm" onClick={logout}>로그아웃</button>
             </div>
           </header>
 
           <main className="content">
-            <div className="content-inner">
-              {role === 'member' && (
-                <div className="only-mobile" style={{ marginBottom: 14 }}>
-                  <div className="userpick" style={{ marginTop: 0 }}>
-                    <Avatar user={currentUser} size={28} />
-                    <select value={currentUserId} onChange={(e) => setCurrentUserId(e.target.value)}>
-                      {members.map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-              {renderPage()}
-            </div>
+            <div className="content-inner">{renderPage()}</div>
           </main>
         </div>
 

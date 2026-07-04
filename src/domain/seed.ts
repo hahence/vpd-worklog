@@ -1,4 +1,5 @@
 import { getPeriod } from './calc'
+import { regionDefault } from './policy'
 import type { Absence, Attendance, Holiday, Team, User, WorkType } from './types'
 import {
   addDays,
@@ -11,18 +12,42 @@ import {
   todayStr,
 } from './time'
 
-export const teams: Team[] = [{ id: 't1', name: '프로덕트 1팀' }]
-
-export const users: User[] = [
-  { id: 'u0', name: '김서준', teamId: 't1', role: 'manager', color: '#4f46e5', defaultCheckIn: '09:00', defaultCheckOut: '18:00' },
-  { id: 'u1', name: '이도현', teamId: 't1', role: 'member', color: '#0ea5e9', defaultCheckIn: '09:30', defaultCheckOut: '18:30' },
-  { id: 'u2', name: '박서연', teamId: 't1', role: 'member', color: '#10b981', defaultCheckIn: '08:30', defaultCheckOut: '17:30' },
-  { id: 'u3', name: '최지우', teamId: 't1', role: 'member', color: '#f59e0b', defaultCheckIn: '10:00', defaultCheckOut: '19:00' },
-  { id: 'u4', name: '정하윤', teamId: 't1', role: 'member', color: '#ec4899', defaultCheckIn: '09:00', defaultCheckOut: '18:00' },
-  { id: 'u5', name: '강민재', teamId: 't1', role: 'member', color: '#8b5cf6', defaultCheckIn: '09:45', defaultCheckOut: '18:45' },
+export const teams: Team[] = [
+  { id: 't1', name: '프로덕트 1팀', region: '판교' },
+  { id: 't2', name: '프로덕트 2팀', region: '대전' },
 ]
 
-// 대한민국 2026 공휴일 (기준월 구간과 무관한 것 포함 — 인프라 데모용)
+// 명단은 추후 실제 데이터로 교체 예정 (사번 5~6자리 / 팀 / 지역)
+// 색상·이름은 데모용. region 이 기본 출퇴근값을 결정.
+const roster: Array<Omit<User, 'defaultCheckIn' | 'defaultCheckOut' | 'region'>> = [
+  // 프로덕트 1팀 (판교)
+  { id: 'u1', empId: '210034', name: '김서준', teamId: 't1', role: 'manager', color: '#4f46e5' },
+  { id: 'u2', empId: '221145', name: '박서연', teamId: 't1', role: 'member', color: '#10b981' },
+  { id: 'u3', empId: '190872', name: '이도현', teamId: 't1', role: 'member', color: '#0ea5e9' },
+  { id: 'u4', empId: '230210', name: '정하윤', teamId: 't1', role: 'member', color: '#ec4899' },
+  { id: 'u5', empId: '205511', name: '최지우', teamId: 't1', role: 'member', color: '#f59e0b' },
+  // 프로덕트 2팀 (대전)
+  { id: 'u6', empId: '180903', name: '강민재', teamId: 't2', role: 'manager', color: '#8b5cf6' },
+  { id: 'u7', empId: '224417', name: '김하늘', teamId: 't2', role: 'member', color: '#0891b2' },
+  { id: 'u8', empId: '231002', name: '문지오', teamId: 't2', role: 'member', color: '#e11d48' },
+  { id: 'u9', empId: '209988', name: '서다은', teamId: 't2', role: 'member', color: '#16a34a' },
+  { id: 'u10', empId: '215566', name: '한예린', teamId: 't2', role: 'member', color: '#d97706' },
+]
+
+const teamRegion = new Map(teams.map((t) => [t.id, t.region]))
+
+export const users: User[] = roster.map((r) => {
+  const region = teamRegion.get(r.teamId) ?? '판교'
+  const def = regionDefault(region)
+  return {
+    ...r,
+    region,
+    defaultCheckIn: def.checkIn,
+    defaultCheckOut: def.checkOut,
+  }
+})
+
+// 대한민국 2026 공휴일 (인프라 데모용)
 export const holidays: Holiday[] = [
   { date: '2026-01-01', name: '신정' },
   { date: '2026-03-01', name: '삼일절' },
@@ -36,14 +61,14 @@ export const holidays: Holiday[] = [
 const period = getPeriod(new Date())
 const TODAY = todayStr()
 
-// 부재 기록 (개인별 목표시간 차이를 보여주기 위한 시드)
+// 부재 기록 (개인별 목표시간 차이 시연)
 export const absences: Absence[] = [
   { id: 'a1', userId: 'u2', startDate: dateInPeriod(6), endDate: dateInPeriod(7), type: 'annual', reason: '가족 여행' },
   { id: 'a2', userId: 'u4', startDate: dateInPeriod(4), endDate: dateInPeriod(4), type: 'half_pm', reason: '병원' },
-  { id: 'a3', userId: 'u3', startDate: futureWorkday(1), endDate: futureWorkday(1), type: 'business', reason: '고객사 미팅' },
+  { id: 'a3', userId: 'u5', startDate: futureWorkday(1), endDate: futureWorkday(1), type: 'business', reason: '고객사 미팅' },
+  { id: 'a4', userId: 'u8', startDate: dateInPeriod(5), endDate: dateInPeriod(5), type: 'annual', reason: '개인 사유' },
 ]
 
-/** 구간 시작 + n번째 평일의 날짜 문자열 */
 function dateInPeriod(nWeekday: number): string {
   let count = 0
   for (const d of eachDate(parseDate(period.start), parseDate(period.end))) {
@@ -55,7 +80,6 @@ function dateInPeriod(nWeekday: number): string {
   return period.start
 }
 
-/** 오늘 이후 n번째 평일 (미래 부재 데모용) */
 function futureWorkday(n: number): string {
   let cur = parseDate(TODAY)
   let count = 0
@@ -68,7 +92,6 @@ function futureWorkday(n: number): string {
   }
 }
 
-// 결정적 의사난수 (index 기반) — 매번 같은 시드 생성
 function jitter(seed: number, spread: number): number {
   const x = Math.sin(seed * 12.9898) * 43758.5453
   return Math.round((x - Math.floor(x) - 0.5) * 2 * spread)
@@ -95,70 +118,55 @@ function halfAbsence(userId: string, date: string): 'am' | 'pm' | null {
   return null
 }
 
-/** 과거 근무 기록 생성 (구간 시작 ~ 어제) + 오늘 일부 */
+/** 로그인 시연용: 이 사번으로 로그인하면 오늘 미입력 상태(입력 흐름 시연) */
+export const DEMO_EMPTY_TODAY_USER = 'u3' // 이도현
+
 function buildAttendance(): Attendance[] {
   const out: Attendance[] = []
   let seed = 1
 
   for (const u of users) {
-    if (u.role === 'manager') continue
+    const def = regionDefault(u.region)
     const days = eachDate(parseDate(period.start), parseDate(TODAY))
     for (const d of days) {
       const date = toDateStr(d)
       const isToday = date === TODAY
-      // 오늘은 주말이어도 현황판 시연을 위해 기록 생성, 과거 주말은 건너뜀
       if (isWeekend(d) && !isToday) continue
       if (hasFullAbsence(u.id, date)) continue
 
-      const base = hmToMin(u.defaultCheckIn) + jitter(seed++, 18)
+      const base = hmToMin(def.checkIn) + jitter(seed++, 18)
       const half = halfAbsence(u.id, date)
 
       let checkIn = minToHm(base)
       let outMin: number
       if (half === 'am') {
-        // 오전 반차 → 오후 출근
         checkIn = minToHm(hmToMin('13:00') + jitter(seed++, 10))
         outMin = hmToMin(checkIn) + 4 * 60 + 30
       } else if (half === 'pm') {
-        outMin = hmToMin('14:00') + jitter(seed++, 15)
+        outMin = hmToMin('13:30') + jitter(seed++, 15)
       } else {
         outMin = base + (8 + 1) * 60 + jitter(seed++, 25)
       }
 
       const wt = workTypes[(seed + u.id.length) % workTypes.length]
 
-      if (isToday) {
-        // 오늘: u1(=기본 로그인 사용자)은 미입력 상태로 남겨 입력 흐름 시연
-        if (u.id === 'u1') continue
-        // 일부는 아직 퇴근 전(예정), 일부는 퇴근 완료
-        const stillWorking = seed % 3 !== 0
-        out.push({
-          id: `at-${u.id}-${date}`,
-          userId: u.id,
-          date,
-          checkIn,
-          checkOut: minToHm(outMin),
-          checkOutPlanned: stillWorking,
-          workType: wt,
-          updatedAt: `${date}T${checkIn}:00`,
-        })
-      } else {
-        out.push({
-          id: `at-${u.id}-${date}`,
-          userId: u.id,
-          date,
-          checkIn,
-          checkOut: minToHm(outMin),
-          checkOutPlanned: false,
-          workType: wt,
-          updatedAt: `${date}T${checkIn}:00`,
-        })
-      }
+      // 오늘: 데모용 특정 사용자는 미입력으로 남김
+      if (isToday && u.id === DEMO_EMPTY_TODAY_USER) continue
+
+      out.push({
+        id: `at-${u.id}-${date}`,
+        userId: u.id,
+        date,
+        checkIn,
+        checkOut: minToHm(outMin),
+        checkOutPlanned: isToday ? seed % 3 !== 0 : false,
+        workType: wt,
+        updatedAt: `${date}T${checkIn}:00`,
+      })
     }
   }
   return out
 }
 
 export const attendance: Attendance[] = buildAttendance()
-
 export const seedPeriodLabel = period.label
