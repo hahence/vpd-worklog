@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useApp } from './store/AppStore'
 import { Avatar } from './components/ui'
+import { InstallPrompt } from './components/InstallPrompt'
 import { LoginPage } from './pages/LoginPage'
 import { TodayPage } from './pages/TodayPage'
 import { MonthlyPage } from './pages/MonthlyPage'
@@ -55,6 +56,7 @@ export function App() {
     return (
       <ToastCtx.Provider value={showToast}>
         <LoginPage />
+        <InstallPrompt />
       </ToastCtx.Provider>
     )
   }
@@ -156,6 +158,7 @@ export function App() {
         </nav>
 
         {toast && <div className="toast">{toast}</div>}
+        <InstallPrompt />
       </div>
     </ToastCtx.Provider>
   )
