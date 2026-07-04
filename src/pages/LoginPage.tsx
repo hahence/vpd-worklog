@@ -65,7 +65,7 @@ export function LoginPage() {
               ))}
           </div>
           <div className="small muted" style={{ marginTop: 8 }}>
-            실제 명단은 추후 반영 예정 · 지금은 데모 사번으로 체험하세요
+            1VPD실 명단 {app.users.length}명 반영됨 · 본인 사번으로 로그인하세요
           </div>
         </div>
       </form>

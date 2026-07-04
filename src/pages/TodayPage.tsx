@@ -143,7 +143,7 @@ export function TodayPage() {
                   <div className="trow-main">
                     <div className="trow-name">
                       {m.name}
-                      {m.role === 'manager' && <span className="tag-lead">팀장</span>}
+                      {m.title && <span className="tag-lead">{m.title}</span>}
                       {isMe && <span className="tag-me">나</span>}
                     </div>
                     <div className="trow-times">

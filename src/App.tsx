@@ -76,7 +76,7 @@ export function App() {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 700, fontSize: 13.5 }}>
           {currentUser.name}
-          {currentUser.role === 'manager' && <span className="tag-lead">팀장</span>}
+          {currentUser.title && <span className="tag-lead">{currentUser.title}</span>}
         </div>
         <div className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {team?.name} · 사번 {currentUser.empId}

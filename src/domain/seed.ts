@@ -1,3 +1,4 @@
+import rosterData from '../data/roster.json'
 import { getPeriod } from './calc'
 import { regionDefault } from './policy'
 import type { Absence, Attendance, Holiday, Team, User, WorkType } from './types'
@@ -12,36 +13,43 @@ import {
   todayStr,
 } from './time'
 
-export const teams: Team[] = [
-  { id: 't1', name: '프로덕트 1팀', region: '판교' },
-  { id: 't2', name: '프로덕트 2팀', region: '대전' },
+interface RosterEntry {
+  no: number
+  organization: string
+  name: string
+  employeeId: string
+  role: string[]
+  location: string
+}
+
+const roster = rosterData as RosterEntry[]
+
+const PALETTE = [
+  '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6',
+  '#0891b2', '#e11d48', '#16a34a', '#d97706', '#7c3aed', '#059669',
+  '#dc2626', '#2563eb', '#db2777', '#0d9488',
 ]
 
-// 명단은 추후 실제 데이터로 교체 예정 (사번 5~6자리 / 팀 / 지역)
-// 색상·이름은 데모용. region 이 기본 출퇴근값을 결정.
-const roster: Array<Omit<User, 'defaultCheckIn' | 'defaultCheckOut' | 'region'>> = [
-  // 프로덕트 1팀 (판교)
-  { id: 'u1', empId: '210034', name: '김서준', teamId: 't1', role: 'manager', color: '#4f46e5' },
-  { id: 'u2', empId: '221145', name: '박서연', teamId: 't1', role: 'member', color: '#10b981' },
-  { id: 'u3', empId: '190872', name: '이도현', teamId: 't1', role: 'member', color: '#0ea5e9' },
-  { id: 'u4', empId: '230210', name: '정하윤', teamId: 't1', role: 'member', color: '#ec4899' },
-  { id: 'u5', empId: '205511', name: '최지우', teamId: 't1', role: 'member', color: '#f59e0b' },
-  // 프로덕트 2팀 (대전)
-  { id: 'u6', empId: '180903', name: '강민재', teamId: 't2', role: 'manager', color: '#8b5cf6' },
-  { id: 'u7', empId: '224417', name: '김하늘', teamId: 't2', role: 'member', color: '#0891b2' },
-  { id: 'u8', empId: '231002', name: '문지오', teamId: 't2', role: 'member', color: '#e11d48' },
-  { id: 'u9', empId: '209988', name: '서다은', teamId: 't2', role: 'member', color: '#16a34a' },
-  { id: 'u10', empId: '215566', name: '한예린', teamId: 't2', role: 'member', color: '#d97706' },
-]
+// 조직(=팀)을 첫 등장 순서대로 도출
+const orgNames: string[] = []
+for (const r of roster) if (!orgNames.includes(r.organization)) orgNames.push(r.organization)
 
-const teamRegion = new Map(teams.map((t) => [t.id, t.region]))
+export const teams: Team[] = orgNames.map((name, i) => ({ id: `t${i + 1}`, name }))
+const teamIdByOrg = new Map(orgNames.map((n, i) => [n, `t${i + 1}`]))
 
-export const users: User[] = roster.map((r) => {
-  const region = teamRegion.get(r.teamId) ?? '판교'
+// 사번을 그대로 사용자 id 로 사용 (유일)
+export const users: User[] = roster.map((r, i) => {
+  const region = r.location
   const def = regionDefault(region)
   return {
-    ...r,
+    id: r.employeeId,
+    empId: r.employeeId,
+    name: r.name,
+    teamId: teamIdByOrg.get(r.organization)!,
+    role: r.role.length > 0 ? 'manager' : 'member',
+    title: r.role[0],
     region,
+    color: PALETTE[i % PALETTE.length],
     defaultCheckIn: def.checkIn,
     defaultCheckOut: def.checkOut,
   }
@@ -61,12 +69,14 @@ export const holidays: Holiday[] = [
 const period = getPeriod(new Date())
 const TODAY = todayStr()
 
-// 부재 기록 (개인별 목표시간 차이 시연)
+/** 로그인 시연용: 이 사번으로 로그인하면 오늘 미입력 상태(입력 흐름 시연) */
+export const DEMO_EMPTY_TODAY_USER = '271472' // 이효승 (MBD플랫폼Project)
+
+// 데모용 부재 기록 (개인별 목표시간 차이 시연 · 로컬 전용 임시 데이터)
 export const absences: Absence[] = [
-  { id: 'a1', userId: 'u2', startDate: dateInPeriod(6), endDate: dateInPeriod(7), type: 'annual', reason: '가족 여행' },
-  { id: 'a2', userId: 'u4', startDate: dateInPeriod(4), endDate: dateInPeriod(4), type: 'half_pm', reason: '병원' },
-  { id: 'a3', userId: 'u5', startDate: futureWorkday(1), endDate: futureWorkday(1), type: 'business', reason: '고객사 미팅' },
-  { id: 'a4', userId: 'u8', startDate: dateInPeriod(5), endDate: dateInPeriod(5), type: 'annual', reason: '개인 사유' },
+  { id: 'a1', userId: '137002', startDate: dateInPeriod(6), endDate: dateInPeriod(7), type: 'annual', reason: '연차' },
+  { id: 'a2', userId: '243120', startDate: dateInPeriod(4), endDate: dateInPeriod(4), type: 'half_pm', reason: '반차' },
+  { id: 'a3', userId: '261379', startDate: futureWorkday(1), endDate: futureWorkday(1), type: 'business', reason: '출장' },
 ]
 
 function dateInPeriod(nWeekday: number): string {
@@ -97,7 +107,7 @@ function jitter(seed: number, spread: number): number {
   return Math.round((x - Math.floor(x) - 0.5) * 2 * spread)
 }
 
-const workTypes: WorkType[] = ['office', 'office', 'office', 'remote', 'field']
+const workTypes: WorkType[] = ['office', 'office', 'office', 'office', 'remote', 'field']
 
 function hasFullAbsence(userId: string, date: string): boolean {
   return absences.some(
@@ -118,9 +128,7 @@ function halfAbsence(userId: string, date: string): 'am' | 'pm' | null {
   return null
 }
 
-/** 로그인 시연용: 이 사번으로 로그인하면 오늘 미입력 상태(입력 흐름 시연) */
-export const DEMO_EMPTY_TODAY_USER = 'u3' // 이도현
-
+/** 데모용 근무 기록 생성 (구간 시작 ~ 오늘). 실제 사용 시 각자 입력으로 대체됨. */
 function buildAttendance(): Attendance[] {
   const out: Attendance[] = []
   let seed = 1
@@ -143,14 +151,13 @@ function buildAttendance(): Attendance[] {
         checkIn = minToHm(hmToMin('13:00') + jitter(seed++, 10))
         outMin = hmToMin(checkIn) + 4 * 60 + 30
       } else if (half === 'pm') {
-        outMin = hmToMin('13:30') + jitter(seed++, 15)
+        outMin = hmToMin('13:00') + jitter(seed++, 15)
       } else {
         outMin = base + (8 + 1) * 60 + jitter(seed++, 25)
       }
 
-      const wt = workTypes[(seed + u.id.length) % workTypes.length]
+      const wt = workTypes[(seed + u.name.length) % workTypes.length]
 
-      // 오늘: 데모용 특정 사용자는 미입력으로 남김
       if (isToday && u.id === DEMO_EMPTY_TODAY_USER) continue
 
       out.push({

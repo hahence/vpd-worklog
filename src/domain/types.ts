@@ -17,6 +17,8 @@ export interface User {
   name: string
   teamId: string
   role: Role
+  /** 직책 표기 (실장님/리더 등). 없으면 일반 구성원 */
+  title?: string
   color: string
   /** 근무 지역 (기본 출퇴근시각을 결정) */
   region: string
@@ -29,7 +31,7 @@ export interface User {
 export interface Team {
   id: string
   name: string
-  region: string
+  region?: string
 }
 
 export interface Attendance {

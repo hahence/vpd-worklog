@@ -12,14 +12,17 @@ export const POLICY = {
   periodEndDay: 19,
 } as const
 
-/** 지역별 기본 출퇴근시각 (지역마다 조금씩 다름) */
+/**
+ * 지역별 기본 출퇴근시각 (지역마다 조금씩 다름).
+ * ※ 창원/가산 기본값은 임시값 — 실제 지역별 표준시각을 알려주시면 교체.
+ */
 export const REGION_DEFAULT: Record<string, { checkIn: string; checkOut: string }> = {
-  판교: { checkIn: '08:30', checkOut: '17:30' },
-  대전: { checkIn: '08:00', checkOut: '17:00' },
+  창원: { checkIn: '08:00', checkOut: '17:00' },
+  가산: { checkIn: '08:30', checkOut: '17:30' },
 }
 
 export function regionDefault(region: string) {
-  return REGION_DEFAULT[region] ?? { checkIn: '09:00', checkOut: '18:00' }
+  return REGION_DEFAULT[region] ?? { checkIn: '08:00', checkOut: '17:00' }
 }
 
 export const WORK_TYPE_LABEL: Record<WorkType, string> = {

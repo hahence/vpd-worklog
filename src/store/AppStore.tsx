@@ -23,8 +23,8 @@ import {
 } from '../domain/seed'
 import { todayStr } from '../domain/time'
 
-const STORAGE_KEY = 'vpd-worklog-v2'
-const AUTH_KEY = 'vpd-worklog-auth-v2'
+const STORAGE_KEY = 'vpd-worklog-v3'
+const AUTH_KEY = 'vpd-worklog-auth-v3'
 
 interface PersistShape {
   attendance: Attendance[]
