@@ -5,19 +5,14 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 
 mkdirSync('public', { recursive: true })
 
+// 브랜드: 레드(#E34955) 배경 + 화이트 시계 + 블랙 분침
 const icon = (rounded) => `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#6d5cf0"/>
-      <stop offset="1" stop-color="#4f46e5"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="${rounded ? 112 : 0}" fill="url(#g)"/>
-  <g fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round">
+  <rect width="512" height="512" rx="${rounded ? 112 : 0}" fill="#e34955"/>
+  <g fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round">
     <circle cx="256" cy="256" r="132"/>
     <line x1="256" y1="256" x2="256" y2="158"/>
-    <line x1="256" y1="256" x2="332" y2="300"/>
   </g>
+  <line x1="256" y1="256" x2="332" y2="300" fill="none" stroke="#000000" stroke-width="26" stroke-linecap="round"/>
   <circle cx="256" cy="256" r="17" fill="#ffffff"/>
 </svg>`
 

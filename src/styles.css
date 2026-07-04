@@ -1,24 +1,27 @@
 :root {
-  --accent: #4f46e5;
-  --accent-600: #4338ca;
-  --accent-soft: #eef2ff;
-  --bg: #f5f6fa;
+  /* Brand: Red / Black / White */
+  --accent: #e34955;
+  --accent-600: #c8323f;
+  --accent-soft: #fce9eb;
+  --ink: #000000;
+  --bg: #f2f2f3;
   --surface: #ffffff;
-  --text: #1e2233;
-  --text-2: #5b6172;
-  --text-3: #9aa0b0;
-  --border: #eceef3;
-  --green: #10b981;
-  --green-soft: #e7f7f0;
-  --amber: #f59e0b;
-  --amber-soft: #fef4e2;
-  --red: #ef4444;
-  --red-soft: #fdecec;
-  --blue: #0ea5e9;
-  --shadow: 0 1px 2px rgba(20, 24, 40, 0.04), 0 6px 20px rgba(20, 24, 40, 0.06);
-  --shadow-lg: 0 8px 30px rgba(20, 24, 40, 0.12);
-  --radius: 16px;
-  --radius-sm: 12px;
+  --text: #131316;
+  --text-2: #54555b;
+  --text-3: #9a9aa2;
+  --border: #e9e9ec;
+  /* semantic → 테마에 맞춰 black/red 계열로 재매핑 */
+  --green: #000000;
+  --green-soft: #f0f0f1;
+  --amber: #000000;
+  --amber-soft: #f0f0f1;
+  --red: #e34955;
+  --red-soft: #fce9eb;
+  --blue: #000000;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.14);
+  --radius: 12px;
+  --radius-sm: 10px;
   --nav-w: 244px;
   --maxw: 1120px;
 }
@@ -58,9 +61,10 @@ input, select, button { font-family: inherit; font-size: inherit; }
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 20px; }
 .brand-logo {
-  width: 34px; height: 34px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #7c73ff);
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--ink);
   display: grid; place-items: center; color: #fff; font-size: 18px;
+  border: 2px solid var(--accent);
 }
 .brand-name { font-weight: 700; font-size: 16px; letter-spacing: -0.2px; }
 .brand-sub { font-size: 11px; color: var(--text-3); }
@@ -132,7 +136,7 @@ input, select, button { font-family: inherit; font-size: inherit; }
 
 /* ---------- Big check-in hero ---------- */
 .hero {
-  background: linear-gradient(135deg, #4f46e5, #6d5cf0 55%, #7c73ff);
+  background: var(--ink);
   color: #fff; border-radius: 20px; padding: 22px; box-shadow: var(--shadow-lg);
 }
 .hero .date { opacity: 0.85; font-size: 13px; }
@@ -173,18 +177,18 @@ input, select, button { font-family: inherit; font-size: inherit; }
   background: #f0f1f5; color: var(--text-2);
 }
 .chip.office { background: var(--accent-soft); color: var(--accent-600); }
-.chip.remote { background: var(--green-soft); color: #0a8f66; }
-.chip.field { background: var(--amber-soft); color: #b9770a; }
-.chip.absent { background: var(--red-soft); color: #cf3838; }
-.chip.core-ok { background: var(--green-soft); color: #0a8f66; }
-.chip.core-no { background: #f0f1f5; color: var(--text-3); }
-.chip.planned { background: #eef2ff; color: #6366f1; }
-.chip.rest { background: #fdecec; color: #cf3838; }
+.chip.remote { background: #eaeaec; color: #000; }
+.chip.field { background: #fff; color: #000; border: 1px solid #d7d7db; }
+.chip.absent { background: var(--accent-soft); color: var(--accent-600); }
+.chip.core-ok { background: var(--ink); color: #fff; }
+.chip.core-no { background: #eeeef0; color: var(--text-3); }
+.chip.planned { background: #eeeef0; color: #555; }
+.chip.rest { background: var(--accent-soft); color: var(--accent-600); }
 .rest-note {
   background: #fff5f5; border: 1px solid #fde0e0; color: #b83636;
   border-radius: 11px; padding: 10px 12px; font-size: 13px; margin: 4px 0 14px;
 }
-.chip.holiday-badge { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+.chip.holiday-badge { background: var(--accent-soft); color: var(--accent-600); border: 1px solid #f4c4c9; }
 
 /* ---------- Time input ---------- */
 .field { margin-bottom: 14px; }
@@ -204,11 +208,11 @@ input, select, button { font-family: inherit; font-size: inherit; }
 .stat .v { font-size: 26px; font-weight: 800; letter-spacing: -0.6px; font-variant-numeric: tabular-nums; }
 .stat .v small { font-size: 14px; font-weight: 600; color: var(--text-3); }
 
-.progress { height: 10px; background: #eef0f5; border-radius: 999px; overflow: hidden; }
-.progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), #7c73ff); transition: width 0.4s; }
+.progress { height: 10px; background: #ededf0; border-radius: 999px; overflow: hidden; }
+.progress > span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.4s; }
 .progress.thin { height: 7px; }
-.progress > span.over { background: linear-gradient(90deg, var(--green), #34d399); }
-.progress > span.low { background: linear-gradient(90deg, var(--amber), #fbbf24); }
+.progress > span.over { background: var(--ink); }
+.progress > span.low { background: #f0a5ac; }
 
 /* ---------- Member card (dashboard) ---------- */
 .mcard { display: flex; flex-direction: column; gap: 10px; }
@@ -254,8 +258,8 @@ input, select, button { font-family: inherit; font-size: inherit; }
   box-shadow: var(--shadow-lg); border-radius: 16px; padding: 12px 14px;
 }
 .install-ic {
-  width: 40px; height: 40px; border-radius: 11px; flex: 0 0 auto;
-  background: linear-gradient(135deg, var(--accent), #7c73ff);
+  width: 40px; height: 40px; border-radius: 10px; flex: 0 0 auto;
+  background: var(--ink); border: 2px solid var(--accent);
   display: grid; place-items: center; color: #fff; font-size: 20px;
 }
 .install-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -272,7 +276,7 @@ input, select, button { font-family: inherit; font-size: inherit; }
 /* ---------- Login ---------- */
 .login-wrap {
   min-height: 100vh; display: grid; place-items: center; padding: 24px;
-  background: radial-gradient(1200px 600px at 50% -10%, #eef0ff, var(--bg));
+  background: radial-gradient(1200px 600px at 50% -10%, #fbe4e7, var(--bg));
 }
 .login-card {
   width: 100%; max-width: 380px; background: var(--surface);
@@ -280,8 +284,8 @@ input, select, button { font-family: inherit; font-size: inherit; }
   padding: 30px 26px; text-align: center;
 }
 .login-logo {
-  width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 14px;
-  background: linear-gradient(135deg, var(--accent), #7c73ff);
+  width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 14px;
+  background: var(--ink); border: 3px solid var(--accent);
   display: grid; place-items: center; color: #fff; font-size: 28px;
 }
 .login-title { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
@@ -305,7 +309,7 @@ input, select, button { font-family: inherit; font-size: inherit; }
 .trow-times { font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; margin-top: 2px; }
 .trow-side { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .tag-lead { font-size: 10.5px; font-weight: 700; color: var(--accent-600); background: var(--accent-soft); padding: 1px 6px; border-radius: 6px; }
-.tag-me { font-size: 10.5px; font-weight: 700; color: #0a8f66; background: var(--green-soft); padding: 1px 6px; border-radius: 6px; }
+.tag-me { font-size: 10.5px; font-weight: 700; color: #fff; background: var(--ink); padding: 1px 6px; border-radius: 6px; }
 
 @media (max-width: 860px) {
   .trow-side { flex-direction: column; align-items: flex-end; gap: 4px; }
