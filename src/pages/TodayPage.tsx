@@ -4,7 +4,7 @@ import { useToast } from '../App'
 import { Avatar, WorkTypeChip } from '../components/ui'
 import { WORK_TYPE_ICON, WORK_TYPE_LABEL, ABSENCE_LABEL, regionDefault } from '../domain/policy'
 import type { Absence, WorkType } from '../domain/types'
-import { coversCoreTime } from '../domain/calc'
+import { coversCoreTime, restInfo } from '../domain/calc'
 import { todayStr, weekdayKr } from '../domain/time'
 
 const WORK_TYPES: WorkType[] = ['office', 'remote', 'field']
@@ -28,6 +28,8 @@ export function TodayPage() {
   const [outTime, setOutTime] = useState(rec?.checkOut ?? def.checkOut)
   const [workType, setWorkType] = useState<WorkType>(rec?.workType ?? 'office')
   const [query, setQuery] = useState('')
+
+  const rest = restInfo(app.holidays, today)
 
   const savedDefault = !!rec && rec.checkIn === def.checkIn && rec.checkOut === def.checkOut
   const changed =
@@ -54,7 +56,14 @@ export function TodayPage() {
   return (
     <>
       <div className="page-head">
-        <h1 className="page-title">오늘 근태</h1>
+        <h1 className="page-title">
+          오늘 근태
+          {rest.isRest && (
+            <span className="chip holiday-badge" style={{ marginLeft: 10, verticalAlign: 'middle' }}>
+              🌙 휴일 · {rest.label}
+            </span>
+          )}
+        </h1>
         <p className="page-sub">
           {team.name} · {me.region} · {now.getMonth() + 1}월 {now.getDate()}일 ({weekdayKr(now)}) ·
           코어타임 10:00–15:00
@@ -73,6 +82,12 @@ export function TodayPage() {
           </div>
           {rec && <span className="chip core-ok">저장됨</span>}
         </div>
+
+        {rest.isRest && (
+          <div className="rest-note">
+            오늘은 <b>{rest.holiday ?? weekdayKr(now) + '요일'}</b> 휴일이에요. 근무한 경우에만 입력하세요.
+          </div>
+        )}
 
         <div className="row-2">
           <div className="field">

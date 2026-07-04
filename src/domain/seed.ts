@@ -1,4 +1,5 @@
 import rosterData from '../data/roster.json'
+import holidayData from '../data/holidays.json'
 import { getPeriod } from './calc'
 import { regionDefault } from './policy'
 import type { Absence, Attendance, Holiday, Team, User, WorkType } from './types'
@@ -55,16 +56,9 @@ export const users: User[] = roster.map((r, i) => {
   }
 })
 
-// 대한민국 2026 공휴일 (인프라 데모용)
-export const holidays: Holiday[] = [
-  { date: '2026-01-01', name: '신정' },
-  { date: '2026-03-01', name: '삼일절' },
-  { date: '2026-05-05', name: '어린이날' },
-  { date: '2026-06-06', name: '현충일' },
-  { date: '2026-08-15', name: '광복절' },
-  { date: '2026-10-03', name: '개천절' },
-  { date: '2026-12-25', name: '성탄절' },
-]
+// 대한민국 2026 공휴일 (대체공휴일 포함) — src/data/holidays.json 관리
+export const holidays: Holiday[] = holidayData as Holiday[]
+const holidaySet = new Set(holidays.map((h) => h.date))
 
 const period = getPeriod(new Date())
 const TODAY = todayStr()
@@ -140,6 +134,7 @@ function buildAttendance(): Attendance[] {
       const date = toDateStr(d)
       const isToday = date === TODAY
       if (isWeekend(d) && !isToday) continue
+      if (holidaySet.has(date) && !isToday) continue // 공휴일은 근무 기록 생성 안 함
       if (hasFullAbsence(u.id, date)) continue
 
       const base = hmToMin(def.checkIn) + jitter(seed++, 18)

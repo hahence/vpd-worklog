@@ -5,10 +5,11 @@ import { ABSENCE_LABEL } from '../domain/policy'
 import {
   getPeriod,
   monthSummary,
+  restInfo,
   shiftPeriod,
   workedHours,
 } from '../domain/calc'
-import { fmtDateKr, fmtHours, isWeekend, parseDate, todayStr } from '../domain/time'
+import { fmtDateKr, fmtHours, todayStr } from '../domain/time'
 
 export function MyWork({ embed = false }: { embed?: boolean }) {
   const app = useApp()
@@ -114,12 +115,15 @@ export function MyWork({ embed = false }: { embed?: boolean }) {
         ) : (
           <div className="rowlist">
             {records.map((r) => {
-              const wknd = isWeekend(parseDate(r.date))
+              const rest = restInfo(app.holidays, r.date)
               return (
                 <div className="rrow" key={r.id}>
-                  <span className={`rdate ${wknd ? 'wknd' : ''}`}>{fmtDateKr(r.date)}</span>
+                  <span className={`rdate ${rest.isRest ? 'wknd' : ''}`}>{fmtDateKr(r.date)}</span>
                   <span className="rtimes">
                     {r.checkIn ?? '—'} – {r.checkOut ?? '—'}
+                    {rest.isRest && (
+                      <span className="chip rest" style={{ marginLeft: 8 }}>{rest.label}</span>
+                    )}
                     {r.checkOutPlanned && r.date === today && (
                       <span className="chip planned" style={{ marginLeft: 8 }}>예정</span>
                     )}

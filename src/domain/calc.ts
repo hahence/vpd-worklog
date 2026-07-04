@@ -220,6 +220,24 @@ export function monthSummary(
   }
 }
 
+/** 해당 날짜의 공휴일명 (없으면 undefined) */
+export function holidayOn(holidays: Holiday[], date: string): string | undefined {
+  return holidays.find((h) => h.date === date)?.name
+}
+
+/** 휴일 정보: 주말 또는 공휴일 여부와 표기 라벨 */
+export function restInfo(
+  holidays: Holiday[],
+  date: string,
+): { isRest: boolean; label?: string; holiday?: string; weekend: boolean } {
+  const d = parseDate(date)
+  const weekend = isWeekend(d)
+  const holiday = holidayOn(holidays, date)
+  if (holiday) return { isRest: true, label: holiday, holiday, weekend }
+  if (weekend) return { isRest: true, label: '주말', weekend: true }
+  return { isRest: false, weekend: false }
+}
+
 /** 코어타임(10:00~15:00) 재석 여부 */
 export function coversCoreTime(a: Attendance): boolean {
   if (!a.checkIn || !a.checkOut) return false

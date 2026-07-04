@@ -179,6 +179,12 @@ input, select, button { font-family: inherit; font-size: inherit; }
 .chip.core-ok { background: var(--green-soft); color: #0a8f66; }
 .chip.core-no { background: #f0f1f5; color: var(--text-3); }
 .chip.planned { background: #eef2ff; color: #6366f1; }
+.chip.rest { background: #fdecec; color: #cf3838; }
+.rest-note {
+  background: #fff5f5; border: 1px solid #fde0e0; color: #b83636;
+  border-radius: 11px; padding: 10px 12px; font-size: 13px; margin: 4px 0 14px;
+}
+.chip.holiday-badge { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
 
 /* ---------- Time input ---------- */
 .field { margin-bottom: 14px; }
