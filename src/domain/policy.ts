@@ -14,7 +14,7 @@ export const POLICY = {
 
 /**
  * 지역별 기본 출퇴근시각 (지역마다 조금씩 다름).
- * ※ 창원/가산 기본값은 임시값 — 실제 지역별 표준시각을 알려주시면 교체.
+ * 창원 08:00–17:00 / 가산 08:30–17:30 (확정).
  */
 export const REGION_DEFAULT: Record<string, { checkIn: string; checkOut: string }> = {
   창원: { checkIn: '08:00', checkOut: '17:00' },
