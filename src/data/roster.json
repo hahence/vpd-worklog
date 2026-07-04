@@ -1,5 +1,5 @@
 [
-  { "no": 1, "organization": "1VPD실", "name": "박만수", "employeeId": "129413", "role": ["실장님"], "location": "창원" },
+  { "no": 1, "organization": "VPD실", "name": "박만수", "employeeId": "129413", "role": ["실장님"], "location": "창원" },
   { "no": 2, "organization": "MBD플랫폼Project", "name": "하병국", "employeeId": "231395", "role": ["리더"], "location": "창원" },
   { "no": 3, "organization": "MBD플랫폼Project", "name": "이효승", "employeeId": "271472", "role": [], "location": "창원" },
   { "no": 4, "organization": "MBD플랫폼Project", "name": "조만석", "employeeId": "137002", "role": [], "location": "창원" },

@@ -65,7 +65,7 @@ export function LoginPage() {
               ))}
           </div>
           <div className="small muted" style={{ marginTop: 8 }}>
-            1VPD실 명단 {app.users.length}명 반영됨 · 본인 사번으로 로그인하세요
+            VPD실 명단 {app.users.length}명 반영됨 · 본인 사번으로 로그인하세요
           </div>
         </div>
       </form>
